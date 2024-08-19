@@ -1,6 +1,9 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 
 const handler = {
+  invoke(channel: string, ...args: unknown[]) {
+    return ipcRenderer.invoke(channel, ...args)
+  },
   send(channel: string, value: unknown) {
     ipcRenderer.send(channel, value)
   },

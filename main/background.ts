@@ -2,6 +2,8 @@ import path from 'path'
 import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
+import { dialog } from 'electron'
+import fs from 'fs'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -37,4 +39,17 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('message', async (event, arg) => {
   event.reply('message', `${arg} World!`)
+})
+
+ipcMain.handle('select-image', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }]
+  })
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    const imagePath = result.filePaths[0]
+    const imageData = fs.readFileSync(imagePath).toString('base64')
+    return `data:image/${path.extname(imagePath).slice(1)};base64,${imageData}`
+  }
 })
