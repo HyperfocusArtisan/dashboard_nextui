@@ -1,7 +1,7 @@
 import * as React from "react";
 import styles from './Main.module.css';
 
-const Main = ({ imageUrl, ...props }) => {
+const Main = ({ imageUrl, updateAnchorPosition, updateSidebarAnchorPosition, ...props }) => {
   const [dimensions, setDimensions] = React.useState({
     width: 1680,
     height: 1050,
@@ -22,7 +22,7 @@ const Main = ({ imageUrl, ...props }) => {
   }, []);
 
   return (
-    <div>
+    <div id="svg-container" style={{position: 'relative'}}>
       <svg
         width="100%"
         height="100%"
@@ -48,11 +48,41 @@ const Main = ({ imageUrl, ...props }) => {
         </g>
         <circle
           data-nav-anchor
-          cx={dimensions.width - 4}
-          cy={150}
+          cx={294 + 20}
+          cy={0}
           r="1"
           fill="none"
+          onMouseMove={(e) => {
+            const circle = e.target as SVGCircleElement;
+            const svg = circle.ownerSVGElement;
+            if (svg) {
+              const pt = svg.createSVGPoint();
+              pt.x = e.clientX;
+              pt.y = e.clientY;
+              const svgP = pt.matrixTransform(svg.getScreenCTM()?.inverse());
+              updateAnchorPosition(svgP.x, svgP.y);
+            }
+          }}
         />
+        <circle
+          data-sidebar-anchor
+          cx={0}
+          cy={314.105 + 20}
+          r="1"
+          fill="none"
+          onMouseMove={(e) => {
+            const circle = e.target as SVGCircleElement;
+            const svg = circle.ownerSVGElement;
+            if (svg) {
+              const pt = svg.createSVGPoint();
+              pt.x = e.clientX;
+              pt.y = e.clientY;
+              const svgP = pt.matrixTransform(svg.getScreenCTM()?.inverse());
+              updateSidebarAnchorPosition(svgP.x, svgP.y);
+            }
+          }}
+        />
+
         <defs>
           <filter
             id="filter0_d_111_352"
